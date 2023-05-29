@@ -955,6 +955,7 @@ def simplicial_set_embedding(
     parallel=False,
     verbose=False,
     tqdm_kwds=None,
+    queue=None
 ):
     """Perform a fuzzy simplicial set embedding, using a specified
     initialisation method and then minimizing the fuzzy set cross entropy
