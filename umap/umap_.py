@@ -1209,6 +1209,7 @@ def simplicial_set_embedding(
             densmap_kwds=densmap_kwds,
             tqdm_kwds=tqdm_kwds,
             move_other=True,
+            queue=queue
         )
     else:
         embedding = optimize_layout_generic(
@@ -2323,7 +2324,7 @@ class UMAP(BaseEstimator):
 
         return result
 
-    def fit(self, X, y=None, force_all_finite=True):
+    def fit(self, X, y=None, force_all_finite=True, queue=None):
         """Fit X into an embedded space.
 
         Optionally use y for supervised dimension reduction.
@@ -2780,6 +2781,7 @@ class UMAP(BaseEstimator):
                 epochs,
                 init,
                 random_state,  # JH why raw data?
+                queue
             )
 
             if self.n_epochs_list is not None:
@@ -2817,7 +2819,7 @@ class UMAP(BaseEstimator):
 
         return self
 
-    def _fit_embed_data(self, X, n_epochs, init, random_state):
+    def _fit_embed_data(self, X, n_epochs, init, random_state, queue=None):
         """A method wrapper for simplicial_set_embedding that can be
         replaced by subclasses.
         """
@@ -2844,6 +2846,7 @@ class UMAP(BaseEstimator):
             self.random_state is None,
             self.verbose,
             tqdm_kwds=self.tqdm_kwds,
+            queue=queue
         )
 
     def fit_transform(self, X, y=None, force_all_finite=True):

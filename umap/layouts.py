@@ -87,8 +87,14 @@ def _optimize_layout_euclidean_single_epoch(
     dens_R,
     dens_mu,
     dens_mu_tot,
+    queue,
 ):
+    index: int = 0
+    modulo: int = 100
     for i in numba.prange(epochs_per_sample.shape[0]):
+        if queue is not None:
+            if index % modulo == 0:
+                queue.put(head_embedding)
         if epoch_of_next_sample[i] <= n:
             j = head[i]
             k = tail[i]
@@ -183,6 +189,7 @@ def _optimize_layout_euclidean_single_epoch(
             epoch_of_next_negative_sample[i] += (
                 n_neg_samples * epochs_per_negative_sample[i]
             )
+        index += 1
 
 
 def _optimize_layout_euclidean_densmap_epoch_init(
@@ -238,6 +245,7 @@ def optimize_layout_euclidean(
     densmap_kwds=None,
     tqdm_kwds=None,
     move_other=False,
+    queue=None
 ):
     """Improve an embedding using stochastic gradient descent to minimize the
     fuzzy set cross entropy between the 1-skeletons of the high dimensional
@@ -308,8 +316,11 @@ def optimize_layout_euclidean(
     epoch_of_next_sample = epochs_per_sample.copy()
 
     optimize_fn = numba.njit(
-        _optimize_layout_euclidean_single_epoch, fastmath=True, parallel=parallel
-    )
+            _optimize_layout_euclidean_single_epoch,
+            fastmath=True,
+            parallel=parallel,
+        )
+
     if densmap_kwds is None:
         densmap_kwds = {}
     if tqdm_kwds is None:
@@ -405,8 +416,10 @@ def optimize_layout_euclidean(
             dens_R,
             dens_mu,
             dens_mu_tot,
+            None
         )
-
+        if queue is not None:
+            queue.put(head_embedding)
         alpha = initial_alpha * (1.0 - (float(n) / float(n_epochs)))
 
         if verbose and n % int(n_epochs / 10) == 0:
