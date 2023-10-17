@@ -1,3 +1,4 @@
+import platform
 from setuptools import setup
 
 
@@ -15,7 +16,7 @@ def readme():
 
 configuration = {
     "name": "umap-learn",
-    "version": "0.5.3",
+    "version": "0.5.4",
     "description": "Uniform Manifold Approximation and Projection",
     "long_description": readme(),
     "long_description_content_type": "text/x-rst",
@@ -49,9 +50,8 @@ configuration = {
         "scikit-learn >= 0.22",
         "numba >= 0.51.2",
         "pynndescent >= 0.5",
-        "tbb >= 2019.0",
         "tqdm",
-    ],
+    ] + (["tbb >= 2019.0"] if platform.machine().lower().startswith("x86") else []),
     "extras_require": {
         "plot": [
             "pandas",

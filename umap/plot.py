@@ -200,7 +200,7 @@ def _nhood_search(umap_object, nhood_size):
     return indices, dists
 
 
-@numba.jit()
+@numba.jit(nopython=False)
 def _nhood_compare(indices_left, indices_right):
     """Compute Jaccard index of two neighborhoods"""
     result = np.empty(indices_left.shape[0])
@@ -468,7 +468,7 @@ def show(plot_to_show):
     """
     if isinstance(plot_to_show, plt.Axes):
         show_static()
-    elif isinstance(plot_to_show, bpl.Figure):
+    elif isinstance(plot_to_show, bpl.figure):
         show_interactive(plot_to_show)
     elif isinstance(plot_to_show, hv.core.spaces.DynamicMap):
         show_interactive(hv.render(plot_to_show), backend="bokeh")
@@ -1447,10 +1447,11 @@ def interactive(
                 tooltip_dict[col_name] = "@{" + col_name + "}"
             tooltips = list(tooltip_dict.items())
 
-            for _tool in tools:
-                if _tool.__class__.__name__ == "HoverTool":
-                    tooltip_needed = False
-                    break
+            if tools is not None:
+                for _tool in tools:
+                    if _tool.__class__.__name__ == "HoverTool":
+                        tooltip_needed = False
+                        break
 
         if alpha is not None:
             data["alpha"] = alpha

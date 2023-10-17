@@ -1474,12 +1474,12 @@ class UMAP(BaseEstimator):
             * 'spectral': use a spectral embedding of the fuzzy 1-skeleton
             * 'random': assign initial embedding positions at random.
             * 'pca': use the first n_components from PCA applied to the
-            input data.
+                input data.
             * 'tswspectral': use a spectral embedding of the fuzzy
-            1-skeleton, using a truncated singular value decomposition to
-            "warm" up the eigensolver. This is intended as an alternative
-            to the 'spectral' method, if that takes an  excessively long
-            time to complete initialization (or fails to complete).
+                1-skeleton, using a truncated singular value decomposition to
+                "warm" up the eigensolver. This is intended as an alternative
+                to the 'spectral' method, if that takes an  excessively long
+                time to complete initialization (or fails to complete).
             * A numpy array of initial embedding positions.
 
     min_dist: float (optional, default 0.1)
@@ -1554,12 +1554,12 @@ class UMAP(BaseEstimator):
     angular_rp_forest: bool (optional, default False)
         Whether to use an angular random projection forest to initialise
         the approximate nearest neighbor search. This can be faster, but is
-        mostly on useful for metric that use an angular style distance such
+        mostly only useful for a metric that uses an angular style distance such
         as cosine, correlation etc. In the case of those metrics angular forests
         will be chosen automatically.
 
     target_n_neighbors: int (optional, default -1)
-        The number of nearest neighbors to use to construct the target simplcial
+        The number of nearest neighbors to use to construct the target simplicial
         set. If set to -1 use the ``n_neighbors`` value.
 
     target_metric: string or callable (optional, default 'categorical')
@@ -1593,7 +1593,7 @@ class UMAP(BaseEstimator):
 
     unique: bool (optional, default False)
         Controls if the rows of your data should be uniqued before being
-        embedded.  If you have more duplicates than you have n_neighbour
+        embedded.  If you have more duplicates than you have ``n_neighbors``
         you can have the identical data points lying in different regions of
         your space.  It also violates the definition of a metric.
         For to map from internal structures back to your data use the variable
@@ -1941,6 +1941,8 @@ class UMAP(BaseEstimator):
 
         if self.n_jobs < -1 or self.n_jobs == 0:
             raise ValueError("n_jobs must be a postive integer, or -1 (for all cores)")
+        if self.n_jobs != 1 and self.random_state is not None:
+            warn(f"n_jobs value {self.n_jobs} overridden to 1 by setting random_state. Use no seed for parallelism.") 
 
         if self.dens_lambda < 0.0:
             raise ValueError("dens_lambda cannot be negative")
